@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body{
+  margin:0;
+  background:black;
+  color:white;
+  font-family:sans-serif;
+  overflow:hidden;
+}
+
+/* SCREEN SYSTEM */
+.screen{
+  position:fixed;
+  top:0;
+  left:0;
+  width:100vw;
+  height:100vh;
+  display:none;
+  justify-content:center;
+  align-items:center;
+  flex-direction:column;
+  text-align:center;
+}
+
+.active{display:flex;}
+
+/* LOGIN */
+input{
+  padding:14px;
+  width:70%;
+  border:none;
+  border-radius:15px;
+  font-size:16px;
+}
+
+button{
+  padding:14px 26px;
+  border:none;
+  border-radius:25px;
+  background:linear-gradient(45deg,#ff4d6d,#6cf);
+  color:white;
+  margin-top:10px;
+}
+
+/* PHOTO */
+#photo{
+  width:70vw;
+  height:70vw;
+  border-radius:20px;
+  object-fit:cover;
+  box-shadow:0 0 20px pink;
+}
+
+/* WISH TEXT */
+#wish{
+  font-size:4.3vw;
+  line-height:1.6;
+  padding:10px;
+}
+
+/* COUNTDOWN */
+#count{
+  font-size:22vw;
+  animation:pulse 0.7s infinite alternate;
+}
+@keyframes pulse{
+  from{transform:scale(1);}
+  to{transform:scale(1.25);}
+}
+
+/* DARK CINEMA OVERLAY */
+#black{
+  position:fixed;
+  width:100%;
+  height:100%;
+  background:black;
+  display:none;
+  z-index:10;
+}
+
+/* PROPOSAL */
+#proposal{
+  background:black;
+}
+
+#proposal img{
+  width:90%;
+  max-height:90%;
+  object-fit:contain;
+  transform:scale(0.6);
+  opacity:0;
+  transition:all 2.5s ease;
+}
+
+/* PARTICLES */
+.particle{
+  position:absolute;
+  width:4px;
+  height:4px;
+  background:white;
+  border-radius:50%;
+  animation:float 6s linear infinite;
+}
+@keyframes float{
+  from{transform:translateY(100vh);}
+  to{transform:translateY(-10vh);}
+}
+</style>
+</head>
+
+<body>
+
+<div id="black"></div>
+
+<!-- LOGIN -->
+<div id="login" class="screen active">
+  <div>
+    <h2>🔐 Enter Password</h2>
+    <input id="pass" placeholder="password">
+    <button onclick="unlock()">Unlock</button>
+  </div>
+</div>
+
+<!-- BIRTHDAY -->
+<div id="main" class="screen">
+  <div>
+    <h2>Happy Birthday Samiksha 💖</h2>
+    <img id="photo" src="photo1.jpg">
+    <p id="wish"></p>
+    <button onclick="start()">Tap for Surprise 💖</button>
+  </div>
+</div>
+
+<!-- COUNT -->
+<div id="countScreen" class="screen">
+  <h1 id="count">5</h1>
+</div>
+
+<!-- PROPOSAL -->
+<div id="proposal" class="screen">
+  <img id="proposalImg" src="proposal-card.jpg">
+</div>
+
+<audio id="boom" src="boom.mp3"></audio>
+
+<script>
+
+let boom=document.getElementById("boom");
+let music;
+
+/* SCREEN CONTROL */
+function show(id){
+  document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+}
+
+/* PASSWORD (TOUCH SAFE) */
+function unlock(){
+  let val=document.getElementById("pass").value.trim().toLowerCase();
+
+  if(val==="angry bird"){
+    boom.play();
+    show("main");
+    typeText();
+  }
+}
+
+/* SLOW TEXT */
+let text=`Wishing you a very happy and joyful birthday 🎂💗
+May your life always be filled with happiness, love, and success.
+May all your dreams come true.
+You are my peace, my smile, my everything 💖
+Stay my Angry Bird 🐦❤️
+Happy Birthday ✨`;
+
+let i=0;
+
+function typeText(){
+  let box=document.getElementById("wish");
+  box.innerHTML="";
+  let t=setInterval(()=>{
+    box.innerHTML+=text.charAt(i);
+    i++;
+    if(i>=text.length) clearInterval(t);
+  },65);
+}
+
+/* PHOTO SLIDER */
+let photos=["photo1.jpg","photo2.jpg","photo3.jpg","photo4.jpg"];
+let p=0;
+
+setInterval(()=>{
+  let img=document.getElementById("photo");
+  if(!img) return;
+  p=(p+1)%photos.length;
+  img.src=photos[p];
+},2500);
+
+/* START SURPRISE */
+function start(){
+
+  boom.pause();
+  boom.currentTime=0;
+
+  music=new Audio("makhamali.mp3");
+  music.loop=true;
+  music.play();
+
+  show("countScreen");
+
+  let c=5;
+
+  let t=setInterval(()=>{
+    c--;
+    document.getElementById("count").innerText=c;
+
+    if(c===0){
+      clearInterval(t);
+      cinematicReveal();
+    }
+  },1000);
+}
+
+/* CINEMATIC REVEAL */
+function cinematicReveal(){
+
+  let black=document.getElementById("black");
+  black.style.display="block";
+
+  setTimeout(()=>{
+    black.style.display="none";
+    showProposal();
+  },1200);
+}
+
+/* PROPOSAL LEGENDARY */
+function showProposal(){
+
+  show("proposal");
+
+  createParticles();
+
+  let img=document.getElementById("proposalImg");
+
+  setTimeout(()=>{
+    img.style.opacity="1";
+    img.style.transform="scale(1)";
+  },300);
+}
+
+/* PARTICLES */
+function createParticles(){
+  for(let i=0;i<30;i++){
+    let d=document.createElement("div");
+    d.className="particle";
+    d.style.left=Math.random()*100+"%";
+    d.style.animationDuration=(3+Math.random()*4)+"s";
+    document.body.appendChild(d);
+  }
+}
+
+</script>
+
+</body>
+</html>
